@@ -64,6 +64,11 @@ POST_TEXT=$(echo "$json_data" | jq -r --argjson order "$order" '
 # Print the output
 echo "$POST_TEXT"
 
+# Make sure some states are present
+if [[ "$POST_TEXT" != *"CA"* || "$POST_TEXT" != *"NY"* ]]; then
+    exit_error "Formatted output is missing states (at least CA and NY)"
+fi
+
 # Post to Mastodon
 curl "$MASTODON_SERVER"/api/v1/statuses -H "Authorization: Bearer ${MASTODON_TOKEN}" --data "media_ids[]=${MEDIA_ID}" --data "status=${POST_TEXT}"
 
