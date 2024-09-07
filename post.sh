@@ -57,7 +57,7 @@ POST_TEXT=$(echo "$json_data" | jq -r --argjson order "$order" '
     .[] | 
     {
         activity_level_label: .[0].activity_level_label, 
-        states: [.[] | .state] | sort
+        states: [.[] | .state_abbrev] | sort
     } | 
     "\( .activity_level_label ): \( .states | join(", ") )\n"')
 
