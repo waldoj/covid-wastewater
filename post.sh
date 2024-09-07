@@ -70,7 +70,7 @@ if [[ "$POST_TEXT" != *"CA"* || "$POST_TEXT" != *"NY"* ]]; then
 fi
 
 # Post to Mastodon
-curl "$MASTODON_SERVER"/api/v1/statuses -H "Authorization: Bearer ${MASTODON_TOKEN}" --data "media_ids[]=${MEDIA_ID}" --data "status=${POST_TEXT}"
+curl "$MASTODON_SERVER"/api/v1/statuses -H "Authorization: Bearer ${MASTODON_TOKEN}" --data "status=${POST_TEXT}"
 
 RESULT=$?
 if [ "$RESULT" -ne 0 ]; then
