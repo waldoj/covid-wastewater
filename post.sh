@@ -46,7 +46,7 @@ if [[ $? -ne 0 ]]; then
 fi
 
 # Custom order for the activity level labels
-order='["No Data", "Minimal", "Low", "Moderate", "High", "Very High"]'
+order='["No Data", "Minimal", "Very Low", "Low", "Moderate", "High", "Very High"]'
 
 # Extract useful data from the JSON, grouping the data by activity level, listing the states for
 # each
