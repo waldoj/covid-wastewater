@@ -6,10 +6,9 @@ set -euo pipefail
 MASTODON_SERVER="{{MASTODON_SERVER}}"
 
 # Your Mastodon account's access token
-MASTODON_TOKEN="{{MASTODON_TOKEN}}"
 
 # The Covid wastewater source JSON
-JSON_URL="https://www.cdc.gov/wcms/vizdata/NCEZID_DIDRI/NWSSStateMap.json"
+JSON_URL="https://www.cdc.gov/wcms/vizdata/NCEZID_DIDRI/sc2/nwsssc2statemap.json"
 
 # Function to handle errors
 exit_error() {
