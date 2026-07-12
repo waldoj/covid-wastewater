@@ -39,6 +39,8 @@ WEEK=$(curl -sfG ${AUTH[@]+"${AUTH[@]}"} "$BASE" \
 
 if [[ -z "$WEEK" || "$WEEK" == "null" ]]; then
     exit_error "Error: could not determine latest week_end."
+elif [[ $(date -d "$WEEK" +%s) -lt $(date -d "10 days ago" +%s) ]]; then
+    exit_error "Error: latest week_end ($WEEK) is more than 10 days old."
 fi
 printf "For the week ending %s\n\n" "$WEEK" >&2
 
