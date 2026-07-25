@@ -42,7 +42,7 @@ if [[ -z "$WEEK" || "$WEEK" == "null" ]]; then
 elif [[ $(date -d "$WEEK" +%s) -lt $(date -d "10 days ago" +%s) ]]; then
     exit_error "Error: latest week_end ($WEEK) is more than 10 days old."
 fi
-WEEK_TEXT="For the week ending %s\n\n" "$WEEK"
+WEEK_TEXT="For the week ending $WEEK"
 
 # 2. All site rows for that pathogen + week. $limit must exceed the ~750 rows/week.
 json_data=$(curl -sfG ${AUTH[@]+"${AUTH[@]}"} "$BASE" \
@@ -117,7 +117,7 @@ if [[ "$POST_TEXT" != *"CA"* || "$POST_TEXT" != *"NY"* ]]; then
 fi
 
 # Add WEEK_TEXT before POST_TEXT
-POST_TEXT="${WEEK_TEXT}${POST_TEXT}"
+POST_TEXT=$(printf '%s\n\n%s' "$WEEK_TEXT" "$POST_TEXT")
 
 # Post to Mastodon
 curl "$MASTODON_SERVER"/api/v1/statuses -H "Authorization: Bearer ${MASTODON_TOKEN}" --data "status=${POST_TEXT}"
