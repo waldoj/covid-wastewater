@@ -2,11 +2,11 @@
 
 set -euo pipefail
 
-# URL of your Mastodon server, without a trailing slash
-MASTODON_SERVER="{{MASTODON_SERVER}}"
-
-# Your Mastodon account's access token
-MASTODON_TOKEN="{{MASTODON_TOKEN}}"
+# Shared library: credentials, logging, the failure path, and Mastodon
+# transport. See lib/botlib/ and the bot-harness docs.
+. "$(dirname "$0")/lib/botlib/core.sh"
+. "$(dirname "$0")/lib/botlib/secrets.sh"
+. "$(dirname "$0")/lib/botlib/mastodon.sh"
 
 # CDC wastewater dataset (Socrata dataset ID) and the SODA query endpoint.
 BASE="https://data.cdc.gov/resource/atcp-73re.json"
@@ -18,18 +18,11 @@ PATHOGEN="SARS-CoV-2"
 # AUTH=(-H "X-App-Token: ${APP_TOKEN}")
 AUTH=()
 
-# Function to handle errors
-exit_error() {
-    echo "$1" >&2
-    exit 1
-}
-
-# Ensure necessary environment variables are set
-[ "$MASTODON_SERVER" != "{{MASTODON_SERVER}}" ] || exit_error "Error: MASTODON_SERVER is not set."
-[ "$MASTODON_TOKEN" != "{{MASTODON_TOKEN}}" ] || exit_error "Error: MASTODON_TOKEN is not set."
-
 # Move into the directory where this script is found
 cd "$(dirname "$0")" || exit_error "Error: Directory ."
+
+load_secrets covid-wastewater
+require_secrets MASTODON_SERVER MASTODON_TOKEN
 
 # 1. Most recent week_end that has COVID data. Do not hard-code a date.
 WEEK=$(curl -sfG ${AUTH[@]+"${AUTH[@]}"} "$BASE" \
@@ -119,12 +112,14 @@ fi
 # Add WEEK_TEXT before POST_TEXT
 POST_TEXT=$(printf '%s\n\n%s' "$WEEK_TEXT" "$POST_TEXT")
 
-# Post to Mastodon
-curl "$MASTODON_SERVER"/api/v1/statuses -H "Authorization: Bearer ${MASTODON_TOKEN}" --data "status=${POST_TEXT}"
+# Post to Mastodon.
+#
+# Sent as a multipart form rather than the `--data` this bot used to use. The
+# body carries newlines and commas, which `--data` passed raw; a form needs no
+# such care, and it is what every other bot here sends.
+masto_post_status "$POST_TEXT" > /dev/null \
+    || exit_error "Posting message to Mastodon failed."
 
-RESULT=$?
-if [ "$RESULT" -ne 0 ]; then
-    exit_error "Posting message to Mastodon failed."
-fi
+log_info "posted to mastodon week=${WEEK}"
 
 echo "Message successfully posted to Mastodon."
