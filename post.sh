@@ -118,7 +118,7 @@ POST_TEXT=$(printf '%s\n\n%s' "$WEEK_TEXT" "$POST_TEXT")
 # body carries newlines and commas, which `--data` passed raw; a form needs no
 # such care, and it is what every other bot here sends.
 masto_post_status "$POST_TEXT" > /dev/null \
-    || exit_error "Posting message to Mastodon failed."
+    || exit_error "Posting message to Mastodon failed: HTTP ${BOTLIB_LAST_STATUS} ${BOTLIB_LAST_BODY}"
 
 log_info "posted to mastodon week=${WEEK}"
 
